@@ -17,17 +17,12 @@
 	}
 </style>
 <body>
-	<p>
-		Mova o objeto azul com as setas do teclado.<br/>
-		Perceba que, em caso de colisão, <br/> 
-		ele muda de cor!
-	</p>
 	<canvas width="400" height="200"></canvas>
 </body>
 
 <script>
 
-	var LEFT = 37, UP = 38, RIGHT = 39, DOWN = 40;
+	var LEFT = 37, RIGHT = 39;
 	var mvLeft = mvUp = mvRight = mvDown = false;
 	
 	var cnv = document.querySelector("canvas");
@@ -36,44 +31,17 @@
 	var posX = 0;
 	var posY = 150;
 	var SIZE = 50;
-	var speed = 4;
+	var speed = 5;
 	var objColor = "#00f";
 	
 	var blockX = cnv.width/2 - 25;
 	var blockY = cnv.height - 50;
 
-	//Atualiza a posição do objeto
-	function updateBlock(){
-		if(mvLeft && !mvRight){
-			posX -= speed;
-		}
-		if(mvRight && !mvLeft){
-			posX += speed;
-		}
-		if(mvUp && !mvDown){
-			posY -= speed;
-		}
-		if(mvDown && !mvUp){
-			posY += speed;
-		}
-
-		posX = Math.max(0, Math.min(cnv.width - SIZE, posX));
-		posY = Math.max(0, Math.min(cnv.height - SIZE, posY));
-
-	}
-
-	
 	//quando aperta as setas
 	window.addEventListener("keydown",keydownHandler,false);
 	function keydownHandler(e){
 		var key = e.keyCode;
 		switch(key){
-			case UP:
-				mvUp = true;
-				break;
-			case DOWN:
-				mvDown = true;
-				break;
 			case LEFT:
 				mvLeft = true;
 				break;
@@ -88,12 +56,6 @@
 	function keyupHandler(e){
 		var key = e.keyCode;
 		switch(key){
-			case UP:
-				mvUp = false;
-				break;
-			case DOWN:
-				mvDown = false;
-				break;
 			case LEFT:
 				mvLeft = false;
 				break;
@@ -103,9 +65,21 @@
 		}
 	}
 
-	//Confere colisão e, em caso de colisão, muda a cor do objeto para vermelho
+	//Atualiza a posição do objeto
+	function updateBlock(){
+		if(mvLeft && !mvRight){
+			posX -= speed;
+		}
+		if(mvRight && !mvLeft){
+			posX += speed;
+		}
+
+		//impede que passe das bordas 
+		posX = Math.max(0, Math.min(cnv.width - SIZE, posX));
+	}
+
 	function colide(){
-		if  (posX + SIZE > blockX){	//Confere colisão por baixo
+		if  (posX + SIZE > blockX){
 				objColor = "#f00";
 				posX -= speed;
 		} else {
@@ -113,25 +87,22 @@
 		}
 	}
 
-	//desenha na tela
 	function draw(){
 		ctx.clearRect(0,0,cnv.width,cnv.height);
-		//muda a cor para preto e desenha no centro da tela
+
 		ctx.fillStyle = "#000";
 		ctx.fillRect(blockX,blockY,SIZE,SIZE);
-		//Muda a cor do contexto segundo a cor do objeto
+
 		ctx.fillStyle = objColor;
 		ctx.fillRect(posX,posY,SIZE,SIZE);
 	}
 
-	//atualiza os objetos
 	function update(){
 		updateBlock();
 		colide();
 		draw();
 	}
 
-	//Repetição
 	function loop(){
 		update();
 		window.requestAnimationFrame(loop, cnv);
